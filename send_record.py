@@ -16,12 +16,32 @@ def send_record(args):
     if args.schema_file is None:
         raise AttributeError("--schema-file is not provided.")
 
+    if args.security_protocol and args.security_protocol.lower() not in ['plaintext', 'ssl']:
+        raise AttributeError("--security-protocol must be either plaintext or ssl.")
+
     key_schema, value_schema = load_avro_schema_from_file(args.schema_file)
 
     producer_config = {
         "bootstrap.servers": args.bootstrap_servers,
         "schema.registry.url": args.schema_registry
     }
+
+    security_protocol = args.security_protocol.lower()
+
+    if security_protocol == "ssl" and all [
+            args.ssl_ca_location,
+            args.ssl_cert_location,
+            args.ssl_key_location
+        ]:
+        producer_config.update({
+            'security.protocol': security_protocol,
+            'ssl.ca.location': args.ssl_ca_location,
+            'ssl.key.location': args.ssl_key_location,
+            'ssl.certificate.location': args.ssl_cert_location
+        })
+    else:
+        raise AttributeError("--security-protocol is ssl, please supply certificates.")
+
 
     producer = AvroProducer(producer_config, default_key_schema=key_schema, default_value_schema=value_schema)
 
