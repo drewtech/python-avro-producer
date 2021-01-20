@@ -28,11 +28,11 @@ def send_record(args):
 
     security_protocol = args.security_protocol.lower()
 
-    if security_protocol == "ssl" and all [
+    if security_protocol == "ssl" and all ([
             args.ssl_ca_location,
             args.ssl_cert_location,
             args.ssl_key_location
-        ]:
+        ]):
         producer_config.update({
             'security.protocol': security_protocol,
             'ssl.ca.location': args.ssl_ca_location,
