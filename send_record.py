@@ -65,7 +65,7 @@ def send_record(args):
             data = f.readlines()
         for line in data:
             try:
-                producer.produce(topic=args.topic, key=key, value=line)
+                producer.produce(topic=args.topic, key=key, value=json.loads(line))
             except Exception as e:
                 print(f"Exception while producing record value - {line} to topic - {args.topic}: {e}")
             else:
